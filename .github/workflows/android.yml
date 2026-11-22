@@ -1,3 +1,4 @@
+
 name: Build Pocket YER APK
 
 on:
@@ -27,11 +28,20 @@ jobs:
         with:
           gradle-version: '8.9'
 
+      - name: Find Android project
+        run: |
+          PROJECT_DIR=$(dirname "$(find . -name 'settings.gradle' -o -name 'settings.gradle.kts' | head -n 1)")
+          echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
+          echo "Project found at: $PROJECT_DIR"
+
       - name: Build APK
-        run: gradle assembleDebug
+        run: |
+          cd "$PROJECT_DIR"
+          gradle assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: PocketYER-debug-apk
-          path: app/build/outputs/apk/debug/*.apk
+          path: '**/app/build/outputs/apk/debug/*.apk'
+          if-no-files-found: error
